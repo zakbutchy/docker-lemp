@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker LEMP</title>
+</head>
+<style>
+* {
+  margin: 0;
+}
+body {
+  display: flex;
+  height: 100vh;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+}
+div > * {
+  padding: 1em 0;
+}
+</style>
+
+<body>
+  <div>
+    <h1>Hello Docker-LEMP World</h1>
+    <p><a href="http://localhost:8080/index.html">http://localhost:8080/index.html</a></p>
+    <ul>
+      <li>php:8.1-fpm-buster : <a href="http://localhost:8080/phpinfo.php">http://localhost:8080/phpinfo.php</a></li>
+      <li>nginx:1.20-alpine</li>
+      <li>mysql/mysql-server:8.0</li>
+      <li>phpmyadmin/phpmyadmin : <a href="http://localhost:8081">http://localhost:8081</a></li>
+      <li>mailhog : <a href="http://localhost:8025">http://localhost:8025</a></li>
+    </ul>
+  </div>
+</body>
+
+</html>
