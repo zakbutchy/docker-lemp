@@ -1,0 +1,11 @@
+# OS
+**/.DS_Store
+
+# Environment files
+.env
+
+# Editor
+.idea/
+
+# nginx logs (see docker/nginx/default.conf)
+docker/nginx/logs/

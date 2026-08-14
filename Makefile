@@ -1,32 +1,38 @@
 up:
 	docker compose up -d
 build:
+	docker compose build
+build-fresh:
 	docker compose build --no-cache --force-rm
 laravel-install:
 	docker compose exec app composer create-project --prefer-dist laravel/laravel .
 	# If you want to specify a version, use the following command
-	# docker compose exec app composer create-project --prefer-dist  "laravel/laravel=9.*" .
+	# docker compose exec app composer create-project --prefer-dist  "laravel/laravel=11.*" .
 create-laravel-project:
 	rm -rf src/*
 	mkdir -p src
 	@make build
 	@make up
 	@make laravel-install
+	# laravel-installでpackage.jsonが生成されるまで実行できなかったnpm installをここで実行する
+	docker compose exec app npm install
 	docker compose exec app php artisan key:generate
 	docker compose exec app php artisan storage:link
 	docker compose exec app chmod -R 777 storage bootstrap/cache
+	# .envのDB_CONNECTIONをmysqlに変更してから実行すること（デフォルトはsqlite）
 	# @make fresh
 	@make ps
 	docker compose exec app php artisan -V
 install-recommend-packages:
-	# docker compose exec app composer require doctrine/dbal
 	docker compose exec app composer require --dev barryvdh/laravel-ide-helper
 	docker compose exec app composer require --dev barryvdh/laravel-debugbar
+	docker compose exec app composer require --dev larastan/larastan
 	# docker compose exec app php artisan vendor:publish --provider="Barryvdh\Debugbar\ServiceProvider"
 	# docker compose exec app composer require --dev laravel/telescope
 	# docker compose exec app composer require --dev beyondcode/laravel-dump-server
 	# docker compose exec app php artisan vendor:publish --provider="BeyondCode\DumpServer\DumpServerServiceProvider"
-	# docker compose exec app composer require --dev roave/security-advisories:dev-master
+	# docker compose exec app composer require --dev roave/security-advisories:dev-latest
+	# docker compose exec app composer require pestphp/pest --dev --with-all-dependencies
 init:
 	docker compose up -d --build
 	docker compose exec app composer install
@@ -55,20 +61,24 @@ logs:
 	docker compose logs
 logs-watch:
 	docker compose logs --follow
-log-web:
-	docker compose logs web
-log-web-watch:
-	docker compose logs --follow web
+log-nginx:
+	docker compose logs nginx
+log-nginx-watch:
+	docker compose logs --follow nginx
 log-app:
 	docker compose logs app
 log-app-watch:
 	docker compose logs --follow app
-log-db:
-	docker compose logs db
-log-db-watch:
-	docker compose logs --follow db
-web:
-	docker compose exec web sh
+log-mysql:
+	docker compose logs mysql
+log-mysql-watch:
+	docker compose logs --follow mysql
+log-redis:
+	docker compose logs redis
+log-redis-watch:
+	docker compose logs --follow redis
+nginx:
+	docker compose exec nginx sh
 app:
 	docker compose exec app bash
 migrate:
@@ -84,6 +94,10 @@ tinker:
 	docker compose exec app php artisan tinker
 test:
 	docker compose exec app php artisan test
+audit:
+	docker compose exec app composer audit
+npm-audit:
+	docker compose exec app npm audit
 optimize:
 	docker compose exec app php artisan optimize
 optimize-clear:
@@ -97,10 +111,10 @@ cache-clear:
 	docker compose exec app composer clear-cache
 	@make optimize-clear
 	docker compose exec app php artisan event:clear
-db:
-	docker compose exec db bash
+mysql-shell:
+	docker compose exec mysql bash
 mysql:
-	docker compose exec db bash -c 'mysql -u $$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE'
+	docker compose exec mysql bash -c 'mysql -u $$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE'
 redis:
 	docker compose exec redis redis-cli
 ide-helper:
